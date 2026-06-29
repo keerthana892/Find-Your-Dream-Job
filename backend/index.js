@@ -22,7 +22,7 @@ app.use(cookieParser());
 const corsOptions = {
   origin: [
     "http://localhost:5173",
-    "https://your-frontend.vercel.app" // 👉 replace with your real Vercel URL
+    "https://find-your-dream-job-pink.vercel.app"
   ],
   credentials: true,
 };
