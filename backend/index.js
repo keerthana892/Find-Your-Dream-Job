@@ -18,32 +18,25 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
-// ✅ FINAL CORS FIX (VERY IMPORTANT)
+// ================= CORS (FINAL FIX) =================
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://find-your-dream-job-pink.vercel.app"
+];
+
 app.use(cors({
-  origin: true, // allow all origins
-  credentials: true
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
+  credentials: true,
 }));
 
-// ✅ Handle preflight & headers manually (fixes Render + Vercel issue)
-app.use((req, res, next) => {
-  res.header("Access-Control-Allow-Origin", req.headers.origin);
-  res.header("Access-Control-Allow-Credentials", "true");
-  res.header(
-    "Access-Control-Allow-Headers",
-    "Origin, X-Requested-With, Content-Type, Accept, Authorization"
-  );
-  res.header(
-    "Access-Control-Allow-Methods",
-    "GET, POST, PUT, DELETE, OPTIONS"
-  );
-
-  // Handle OPTIONS request (important for login)
-  if (req.method === "OPTIONS") {
-    return res.sendStatus(200);
-  }
-
-  next();
-});
+// ✅ handle preflight requests
+app.options("*", cors());
 
 // ================= ROUTES =================
 app.use("/api/user", userRouter);
@@ -51,7 +44,7 @@ app.use("/api/company", companyRouter);
 app.use("/api/job", jobRouter);
 app.use("/api/application", applicationRouter);
 
-// ✅ Test route
+// ================= TEST ROUTE =================
 app.get("/", (req, res) => {
   res.send("Backend is running 🚀");
 });
